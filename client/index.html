@@ -17,13 +17,62 @@
       <div id="subtitles" aria-live="polite"></div>
     </div>
 
+    <div id="left-controls">
+      <section class="toggles-section">
+        <div class="section-label">main controls</div>
+        <div class="row">
+           <button id="toggleApiBtn" class="btn-primary" style="width: 100%; font-size: 1.1em; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+             <span>🟢 API Listening</span>
+             <span style="font-size: 0.65em; opacity: 0.8; font-weight: normal;">Click to Stop & Save Tokens</span>
+           </button>
+        </div>
+        <div class="row" style="margin-top: 8px;">
+          <label style="width: 100%; display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
+            <span class="muted" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">Listen For (Source Language)</span>
+            <select id="sourceLanguage" class="rate-input mono" style="font-size: 14px; padding: 8px;">
+              <option value="tl">Tagalog (Forced)</option>
+              <option value="fr">French (Forced)</option>
+              <option value="en">English (Forced)</option>
+              <option value="es">Spanish (Forced)</option>
+              <option value="multi">Chaos Mode (Auto-Detect)</option>
+            </select>
+          </label>
+        </div>
+        <div class="section-label" style="margin-top: 8px;">subtitle settings</div>
+        <div class="row">
+          <label>
+            <input id="translateEnabled" type="checkbox" checked />
+            Translate to English
+          </label>
+        </div>
+        <div class="row">
+          <label>
+            <input id="showOriginal" type="checkbox" checked />
+            Show original text
+          </label>
+        </div>
+        <div class="row">
+          <label>
+            <input id="translatedOnly" type="checkbox" />
+            Show translated only
+          </label>
+        </div>
+        <div class="row">
+          <label>
+            <input id="ttsEnabled" type="checkbox" />
+            Text-to-speech (browser · free-ish)
+          </label>
+        </div>
+      </section>
+    </div>
+
     <div id="controls">
       <header class="panel-brand">
         <div class="brand-title-row">
           <h1 class="brand-title">d-translate</h1>
-          <span class="brand-badge">100% legit*</span>
+          <span class="brand-badge">made by mistvlx</span>
         </div>
-        <p class="brand-sub">*not financial advice · built different (bad different)</p>
+        <p class="brand-sub">built different (bad different)</p>
       </header>
 
       <div id="apiBanner" class="api-banner hidden" role="status"></div>
@@ -104,34 +153,6 @@
         <div class="wallet-actions">
           <button id="walletReset" type="button" class="btn-meme">reset counters (copium)</button>
           <span class="tiny-disclaimer mono">server remembers until restart · estimates only</span>
-        </div>
-      </section>
-
-      <section class="toggles-section">
-        <div class="section-label">controls</div>
-        <div class="row">
-          <label>
-            <input id="translateEnabled" type="checkbox" checked />
-            Translate to English
-          </label>
-        </div>
-        <div class="row">
-          <label>
-            <input id="showOriginal" type="checkbox" checked />
-            Show original text
-          </label>
-        </div>
-        <div class="row">
-          <label>
-            <input id="translatedOnly" type="checkbox" />
-            Show translated only
-          </label>
-        </div>
-        <div class="row">
-          <label>
-            <input id="ttsEnabled" type="checkbox" />
-            Text-to-speech (browser · free-ish)
-          </label>
         </div>
       </section>
 

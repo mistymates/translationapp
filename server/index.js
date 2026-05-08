@@ -1,5 +1,8 @@
 import 'dotenv/config';
 
+// Bypass SSL certificate errors (useful for local development behind proxies)
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 import express from 'express';
 import http from 'http';
 import path from 'path';
@@ -113,9 +116,14 @@ const wss = new WebSocketServer({ server });
 // Per-connection UI settings (translation gating happens globally to save cost).
 const clientSettings = new Map(); // ws -> settings
 let translationWanted = false; // if at least one client wants translation enabled
+let globalSourceLanguage = 'tl'; // the forced language for Deepgram, or 'multi' for auto-detect
 
-function updateTranslationWanted() {
+function updateGlobalSettings() {
   translationWanted = Array.from(clientSettings.values()).some((s) => s.translateEnabled);
+  
+  // Just use the first connected client's source language preference, or 'tl' by default
+  const firstClient = Array.from(clientSettings.values())[0];
+  globalSourceLanguage = firstClient ? (firstClient.sourceLanguage || 'tl') : 'tl';
 }
 
 function safeSend(ws, payload) {
@@ -203,8 +211,10 @@ function resetWallet() {
 // Keep only one active segment processing at a time to reduce latency spikes.
 let processing = false;
 let pendingSegment = null;
+let apiPaused = false;
 
 async function processSegment(pcm16leBuffer) {
+  if (apiPaused) return;
   const now = Date.now();
 
   if (!TRANSCRIBE_API_AVAILABLE) {
@@ -232,8 +242,8 @@ async function processSegment(pcm16leBuffer) {
             return deepgramTranscribe({
               apiKey: DEEPGRAM_API_KEY,
               model: TRANSCRIBE_MODEL,
-              language: DEEPGRAM_LANGUAGE,
-              detectLanguage: DEEPGRAM_DETECT_LANGUAGE,
+              language: globalSourceLanguage,
+              detectLanguage: globalSourceLanguage === 'multi',
               wavBuffer
             });
           }
@@ -252,16 +262,19 @@ async function processSegment(pcm16leBuffer) {
         transcript = tr.value;
       } else {
         transcript = tr.value?.transcript ?? '';
-        transcribeDetectedLanguage = tr.value?.detectedLanguage ?? null;
+        transcribeDetectedLanguage = tr.value?.detectedLanguage ?? (globalSourceLanguage !== 'multi' ? globalSourceLanguage : null);
         transcribeLanguageConfidence = Number(tr.value?.languageConfidence ?? 0) || 0;
       }
+
+      const clampedLang = clampDetectedLanguage(transcribeDetectedLanguage);
+      const isEnglishOrOther = clampedLang === 'en' || clampedLang === 'other';
 
       if (
         TRANSCRIBE_PROVIDER === 'deepgram' &&
         TAGALOG_RETRY_ENABLED &&
+        globalSourceLanguage === 'multi' &&
         transcript &&
-        (clampDetectedLanguage(transcribeDetectedLanguage) === 'other' ||
-          transcribeLanguageConfidence < 0.45)
+        (isEnglishOrOther || transcribeLanguageConfidence < 0.65)
       ) {
         const tlRetry = await deepgramTranscribe({
           apiKey: DEEPGRAM_API_KEY,
@@ -409,15 +422,24 @@ wss.on('connection', (ws) => {
   clientSettings.set(ws, {
     translateEnabled: true,
     showOriginal: true,
-    translatedOnly: false
+    translatedOnly: false,
+    sourceLanguage: 'tl'
   });
-  updateTranslationWanted();
+  updateGlobalSettings();
 
   ws.on('message', (raw) => {
     let msg = null;
     try {
       msg = JSON.parse(raw.toString('utf8'));
     } catch {
+      return;
+    }
+
+    if (msg.type === 'toggle_api') {
+      apiPaused = Boolean(msg.paused);
+      for (const clientWs of wss.clients) {
+        safeSend(clientWs, { type: 'api_paused_state', paused: apiPaused });
+      }
       return;
     }
 
@@ -456,7 +478,8 @@ wss.on('connection', (ws) => {
       if (typeof msg.translateEnabled === 'boolean') cur.translateEnabled = msg.translateEnabled;
       if (typeof msg.showOriginal === 'boolean') cur.showOriginal = msg.showOriginal;
       if (typeof msg.translatedOnly === 'boolean') cur.translatedOnly = msg.translatedOnly;
-      updateTranslationWanted();
+      if (typeof msg.sourceLanguage === 'string') cur.sourceLanguage = msg.sourceLanguage;
+      updateGlobalSettings();
     }
 
     if (msg.type === 'wallet_reset') {
@@ -467,11 +490,12 @@ wss.on('connection', (ws) => {
 
   ws.on('close', () => {
     clientSettings.delete(ws);
-    updateTranslationWanted();
+    updateGlobalSettings();
   });
 
   safeSend(ws, { type: 'ready', at: Date.now() });
   safeSend(ws, { type: 'api_billing', active: false });
+  safeSend(ws, { type: 'api_paused_state', paused: apiPaused });
   safeSend(ws, usageSnapshotPayload());
 });
 

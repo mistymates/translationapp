@@ -18,7 +18,7 @@ export async function deepgramTranscribe({
       Authorization: `Token ${apiKey}`,
       'Content-Type': 'audio/wav'
     },
-    body: wavBuffer
+    body: new Blob([wavBuffer], { type: 'audio/wav' })
   });
 
   if (!resp.ok) {

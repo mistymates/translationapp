@@ -8,6 +8,8 @@ const elTranslateEnabled = $('translateEnabled');
 const elShowOriginal = $('showOriginal');
 const elTranslatedOnly = $('translatedOnly');
 const elTtsEnabled = $('ttsEnabled');
+const elSourceLanguage = $('sourceLanguage');
+const elToggleApiBtn = $('toggleApiBtn');
 const elManualInput = $('manualInput');
 const elManualSend = $('manualSend');
 
@@ -52,7 +54,8 @@ const state = {
   translateEnabled: elTranslateEnabled.checked,
   showOriginal: elShowOriginal.checked,
   translatedOnly: elTranslatedOnly.checked,
-  ttsEnabled: elTtsEnabled.checked
+  ttsEnabled: elTtsEnabled.checked,
+  sourceLanguage: elSourceLanguage ? elSourceLanguage.value : 'tl'
 };
 
 let lastUsageSnap = null;
@@ -60,6 +63,15 @@ let ratesBootstrapped = false;
 
 let ws = null;
 let lastSpoken = '';
+let apiPaused = false;
+
+if (elToggleApiBtn) {
+  elToggleApiBtn.addEventListener('click', () => {
+    if (ws && ws.readyState === ws.OPEN) {
+      ws.send(JSON.stringify({ type: 'toggle_api', paused: !apiPaused }));
+    }
+  });
+}
 
 function formatUsd(n) {
   const x = Number(n) || 0;
@@ -190,7 +202,8 @@ function sendSettings() {
       type: 'settings',
       translateEnabled: state.translateEnabled,
       showOriginal: state.showOriginal,
-      translatedOnly: state.translatedOnly
+      translatedOnly: state.translatedOnly,
+      sourceLanguage: state.sourceLanguage
     })
   );
 }
@@ -255,6 +268,19 @@ function connect() {
       applyUsageSnapshot(msg);
     }
 
+    if (msg.type === 'api_paused_state') {
+      apiPaused = msg.paused;
+      if (elToggleApiBtn) {
+        if (apiPaused) {
+          elToggleApiBtn.innerHTML = '<span>🔴 API Paused</span><span style="font-size: 0.65em; opacity: 0.8; font-weight: normal;">Click to Resume Listening</span>';
+          elToggleApiBtn.classList.add('is-paused');
+        } else {
+          elToggleApiBtn.innerHTML = '<span>🟢 API Listening</span><span style="font-size: 0.65em; opacity: 0.8; font-weight: normal;">Click to Stop & Save Tokens</span>';
+          elToggleApiBtn.classList.remove('is-paused');
+        }
+      }
+    }
+
     if (msg.type === 'api_billing') {
       if (elApiBillingLed) elApiBillingLed.classList.toggle('is-active', Boolean(msg.active));
     }
@@ -287,6 +313,13 @@ elTranslateEnabled.addEventListener('change', () => {
   state.translateEnabled = elTranslateEnabled.checked;
   sendSettings();
 });
+
+if (elSourceLanguage) {
+  elSourceLanguage.addEventListener('change', () => {
+    state.sourceLanguage = elSourceLanguage.value;
+    sendSettings();
+  });
+}
 
 elShowOriginal.addEventListener('change', () => {
   state.showOriginal = elShowOriginal.checked;

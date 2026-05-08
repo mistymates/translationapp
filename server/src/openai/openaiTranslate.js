@@ -15,7 +15,7 @@ export async function openaiDetectAndTranslateToEnglish({
 
   const prompt = [
     'You are an expert conversation editor.',
-    'You are given a noisy transcript from live speech recognition.',
+    'You are given a noisy transcript from live speech recognition. The speech is primarily in Tagalog/Filipino (often mixed with English).',
     'Your task:',
     '1. Reconstruct into clear, natural sentences.',
     '2. Remove filler words, stutters, and obvious transcription errors.',
