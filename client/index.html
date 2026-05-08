@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>d-translate · homemade chaos edition</title>
+    <title>VLX-Overlay · Voice Translation</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -34,6 +34,7 @@
               <option value="fr">French (Forced)</option>
               <option value="en">English (Forced)</option>
               <option value="es">Spanish (Forced)</option>
+              <option value="zh">Mandarin (Forced)</option>
               <option value="multi">Chaos Mode (Auto-Detect)</option>
             </select>
           </label>
@@ -69,10 +70,10 @@
     <div id="controls">
       <header class="panel-brand">
         <div class="brand-title-row">
-          <h1 class="brand-title">d-translate</h1>
+          <h1 class="brand-title">VLX-Overlay</h1>
           <span class="brand-badge">made by mistvlx</span>
         </div>
-        <p class="brand-sub">built different (bad different)</p>
+        <p class="brand-sub">Universal Voice Translation</p>
       </header>
 
       <div id="apiBanner" class="api-banner hidden" role="status"></div>
@@ -82,16 +83,16 @@
         <span
           id="apiBillingLed"
           class="api-billing-led"
-          title="Green while OpenAI API requests are in flight"
+          title="Green while API requests are in flight"
           role="img"
-          aria-label="OpenAI usage indicator"
+          aria-label="API usage indicator"
         ></span>
       </div>
 
       <section class="wallet-card" aria-labelledby="walletHeading">
         <div class="wallet-card-header">
-          <h2 id="walletHeading" class="wallet-heading">wallet damage estimator™</h2>
-          <p id="walletMeme" class="wallet-meme">doing math so you can panic accurately</p>
+          <h2 id="walletHeading" class="wallet-heading">Session Usage Estimator</h2>
+          <p id="walletMeme" class="wallet-meme">Monitor your API burn rate</p>
         </div>
 
         <div class="wallet-hero">
@@ -106,7 +107,7 @@
             <dd id="statAudioTime">0:00</dd>
           </div>
           <div class="stat-line">
-            <dt>time staring at API (wifi prayers)</dt>
+            <dt>time staring at API</dt>
             <dd id="statWaitTime">0s</dd>
           </div>
           <div class="stat-line">
@@ -125,17 +126,17 @@
 
         <div class="wallet-breakdown mono">
           <div class="break-row">
-            <span>transcribe (4o mini)</span>
+            <span>transcribe (deepgram)</span>
             <span id="lineTranscribeUsd">$0.0000</span>
           </div>
           <div class="break-row">
-            <span>translate (4o mini chat)</span>
+            <span>translate (google fallback)</span>
             <span id="lineTranslateUsd">$0.0000</span>
           </div>
         </div>
 
         <fieldset class="rate-fieldset">
-          <legend class="rate-legend">rates (edit if OpenAI changed prices on you)</legend>
+          <legend class="rate-legend">rates (edit if API changed prices on you)</legend>
           <label class="rate-label">
             $ / min audio · <span id="rateTransModel" class="muted-inline"></span>
             <input id="rateTranscribeMin" class="rate-input mono" type="number" step="0.0001" min="0" value="0.003" />
@@ -151,27 +152,27 @@
         </fieldset>
 
         <div class="wallet-actions">
-          <button id="walletReset" type="button" class="btn-meme">reset counters (copium)</button>
+          <button id="walletReset" type="button" class="btn-meme">Reset Counters</button>
           <span class="tiny-disclaimer mono">server remembers until restart · estimates only</span>
         </div>
       </section>
 
       <div id="manualTest" class="manual-test">
-        <div class="section-label">UI sandbox (zero robux lost)</div>
+        <div class="section-label">UI Sandbox (Test Overlay)</div>
         <div class="row">
           <textarea
             id="manualInput"
             rows="2"
-            placeholder="fake subtitle go brrr · Kumusta…"
+            placeholder="Type a test subtitle here..."
             spellcheck="false"
           ></textarea>
         </div>
         <div class="row">
-          <button id="manualSend" type="button" class="btn-secondary">send test subtitle</button>
+          <button id="manualSend" type="button" class="btn-secondary">Send test subtitle</button>
         </div>
       </div>
 
-      <p class="footer-meme mono" id="footerMeme">websocket gobbles captions · you provide trauma</p>
+      <p class="footer-meme mono" id="footerMeme">system audio captured · transcribed locally · translated globally</p>
     </div>
 
     <script src="/app.js" type="module"></script>

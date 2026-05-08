@@ -35,19 +35,11 @@ const LS_RATE_IN = 'dtranslate_rate_translate_in';
 const LS_RATE_OUT = 'dtranslate_rate_translate_out';
 
 const WALLET_MEMES = [
-  'doing math so you can panic accurately',
-  'your silence is free · your words are item shop prices',
-  'VAD said no · your wallet thanked it',
-  'this panel has seen things (mostly receipts)',
-  'sigma grindset: checking transcribe per-minute like taxes'
+  'Monitor your API burn rate'
 ];
 
 const FOOTER_MEMES = [
-  'websocket gobbles captions · you provide trauma',
-  'built with spite + stackoverflow',
-  'if it lags blame windows audio · not me trust',
-  'green dot = money velocity · embrace it',
-  'peak UX is fiscal transparency + dumb jokes'
+  'system audio captured · transcribed locally · translated globally'
 ];
 
 const state = {
@@ -168,7 +160,7 @@ function recalcWalletUi() {
 function applyUsageSnapshot(msg) {
   lastUsageSnap = msg;
   if (msg.pricing && elRateTransModel) {
-    elRateTransModel.textContent = msg.pricing.transcribeModel || 'gpt-4o-mini-transcribe';
+    elRateTransModel.textContent = msg.pricing.transcribeModel || 'deepgram-nova-3';
   }
   bootstrapRatesFromServer(msg.pricing);
   recalcWalletUi();
@@ -376,8 +368,5 @@ if (elManualSend && elManualInput) {
     elManualInput.value = '';
   });
 }
-
-setInterval(() => pickMeme(WALLET_MEMES, elWalletMeme), 14000);
-setInterval(() => pickMeme(FOOTER_MEMES, elFooterMeme), 19000);
 
 connect();

@@ -1,62 +1,47 @@
-# d-Translate (MVP)
+# VLX-Overlay
 
-Near real-time voice translation overlay for Roblox voice chat (via system audio loopback).
+A real-time, low-latency voice translation overlay for Roblox, Discord calls, VRChat, or any application running on your PC. It captures your system audio, transcribes foreign speech, and translates it to English instantly using a sleek browser-based overlay.
 
-This MVP:
-- Captures **system audio output** (WASAPI loopback via `native-audio-node`)
-- Runs **WebRTC VAD** to avoid sending silent audio
-- Transcribes speech with Deepgram (`nova-3`)
-- Detects language and translates to English
-- Pushes subtitles to a clean overlay GUI in your browser
+## Features
+- **Universal Capture:** Captures system audio output (WASAPI loopback). If you can hear it on your PC, VLX-Overlay can translate it.
+- **Low Latency:** Uses Voice Activity Detection (VAD) to instantly chunk speech and Deepgram (`nova-3`) for incredibly fast transcription.
+- **Language Forcing:** Explicitly set the language you are listening for (French, Japanese, Mandarin, Tagalog, Spanish) to eliminate AI hallucinations common with short audio segments.
+- **Cost Controls:** Includes a real-time API token burn estimator and a "Stop Listening" button to instantly pause API usage when you don't need translations.
+- **Text-to-Speech:** Can optionally read the translated text out loud using your browser's built-in synthesis.
 
 ## Prerequisites (Windows)
 1. Node.js **20+**
 2. Install dependencies:
-   - `cd server`
-   - `npm install`
-3. Set your Deepgram key:
-   - Create `.env` in `server/` (recommended) with:
-     - `TRANSCRIBE_PROVIDER=deepgram`
-     - `DEEPGRAM_API_KEY=your_key_here`
+   ```bash
+   cd server
+   npm install
+   ```
+3. Set your API keys:
+   - Create a `.env` file in the `server/` directory:
+     ```env
+     TRANSCRIBE_PROVIDER=deepgram
+     DEEPGRAM_API_KEY=your_deepgram_api_key_here
+     ```
 
 ## Run
-1. Start the server:
-   - `cd server`
-   - `npm start`
+1. Start the backend server:
+   ```bash
+   cd server
+   npm start
+   ```
 2. Open the UI:
-   - `http://localhost:3000`
+   - Navigate to `http://localhost:3000` in your browser.
+   - For an overlay experience, you can use browser extensions or tools like OBS/Discord to pin this window over your game.
 
-## Controls
-- `Translate to English`: enables/disables translation (also gates whether the server calls the translation model to save cost)
-- `Show original text`: displays the original transcription line
-- `Show translated only`: hides original text (translated line remains)
-- `Text-to-speech (optional)`: uses your browser speech synthesis
+## UI Controls
+- **Listen For (Source Language):** Force the transcriber to expect a specific language (Tagalog, French, Japanese, Mandarin, Spanish) or use "Chaos Mode" (Auto-Detect).
+- **API Listening / Paused:** Instantly toggle audio processing to save API tokens.
+- **Translate to English:** Toggles the translation step.
+- **Show Original Text:** Displays the original transcription above the translation.
+- **Text-to-speech:** Uses browser speech synthesis to read translations aloud.
 
-## Environment Variables (optional)
-In `server/.env`:
-- `PORT` (default `3000`)
-- `TRANSCRIBE_PROVIDER` (`deepgram` or `openai`, default `deepgram`)
-- `DEEPGRAM_API_KEY` (required for Deepgram transcription unless `UI_TEST_MODE=1`)
-- `OPENAI_API_KEY` (optional; used for translation)
-- `OPENAI_BASE_URL` (optional). Use this for OpenAI-compatible gateways.
-- `UI_TEST_MODE` (default `0`). Set to `1` to skip audio capture/transcription and test the overlay using the built-in manual subtitle box.
-- `VAD_FRAME_MS` (default `30`)
-- `VAD_AGGRESSIVENESS` (0-3, default `3`)
-- `VAD_MIN_SPEECH_MS` (default `250`)
-- `VAD_HANGOVER_MS` (default `300`)
-- `VAD_MAX_SEGMENT_MS` (default `4500`)
-- `DISABLE_VAD` (default `false`; when `true`, sends fixed audio chunks without speech gating)
-- `RAW_SEGMENT_MS` (default `4200`; chunk size used when `DISABLE_VAD=true`)
-- `TAGALOG_RETRY_ENABLED` (default `true`; retries transcription with forced `tl` when multi-detect looks wrong)
-- `TRANSCRIBE_MODEL` (default `nova-3`)
-- `DEEPGRAM_LANGUAGE` (default `multi`; set e.g. `es`, `fr`, `ja` to force one language)
-- `DEEPGRAM_DETECT_LANGUAGE` (default `true`)
-- `TRANSLATE_MODEL` (default `gpt-4o-mini`)
-- `TRANSLATE_ALLOWED_LANGS` (default `fr,es,tl,zh,km`; only these are translated)
-- `TRANSLATE_SKIP_ENGLISH` (default `true`; English lines are not translated)
-- `TRANSLATE_FALLBACK_ENABLED` (default `true`; uses a no-key fallback translator when `OPENAI_API_KEY` is empty)
-
-## Notes / Limitations
-- Roblox audio is captured as **system output**. Ensure Roblox voice chat audio is routed through your system output device.
-- The VAD segmentation is designed to be low-cost and low-latency, but it may split or merge utterances depending on noise/volume.
-
+## Advanced Configuration
+You can customize the underlying behavior by editing `server/.env`:
+- `VAD_FRAME_MS`, `VAD_AGGRESSIVENESS`, `VAD_MIN_SPEECH_MS`, `VAD_MAX_SEGMENT_MS`: Tune the Voice Activity Detection.
+- `TRANSLATE_ALLOWED_LANGS`: Comma-separated list of languages allowed through the translation gate.
+- `UI_TEST_MODE=1`: Run the UI without initializing the audio capture engine (useful for debugging styling).
