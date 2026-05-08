@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>d-translate · homemade chaos edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div id="overlay">
+      <div id="subtitles" aria-live="polite"></div>
+    </div>
+
+    <div id="controls">
+      <header class="panel-brand">
+        <div class="brand-title-row">
+          <h1 class="brand-title">d-translate</h1>
+          <span class="brand-badge">100% legit*</span>
+        </div>
+        <p class="brand-sub">*not financial advice · built different (bad different)</p>
+      </header>
+
+      <div id="apiBanner" class="api-banner hidden" role="status"></div>
+
+      <div id="statusRow" class="row status-row muted">
+        <span id="status">Connecting...</span>
+        <span
+          id="apiBillingLed"
+          class="api-billing-led"
+          title="Green while OpenAI API requests are in flight"
+          role="img"
+          aria-label="OpenAI usage indicator"
+        ></span>
+      </div>
+
+      <section class="wallet-card" aria-labelledby="walletHeading">
+        <div class="wallet-card-header">
+          <h2 id="walletHeading" class="wallet-heading">wallet damage estimator™</h2>
+          <p id="walletMeme" class="wallet-meme">doing math so you can panic accurately</p>
+        </div>
+
+        <div class="wallet-hero">
+          <div class="wallet-total-label">estimated session burn (USD)</div>
+          <div id="walletTotalUsd" class="wallet-total-usd">$0.0000</div>
+          <div class="wallet-hero-sub mono" id="walletHeroSub">0:00 audio → transcribe · translate extras below</div>
+        </div>
+
+        <dl class="wallet-stats mono">
+          <div class="stat-line">
+            <dt>audio eaten by transcribe</dt>
+            <dd id="statAudioTime">0:00</dd>
+          </div>
+          <div class="stat-line">
+            <dt>time staring at API (wifi prayers)</dt>
+            <dd id="statWaitTime">0s</dd>
+          </div>
+          <div class="stat-line">
+            <dt>transcribe segments ok / oops</dt>
+            <dd id="statSegments">0 / 0</dd>
+          </div>
+          <div class="stat-line">
+            <dt>HTTP attempts (incl. retries)</dt>
+            <dd id="statAttempts">tr 0 · tl 0</dd>
+          </div>
+          <div class="stat-line">
+            <dt>translate tokens (in / out)</dt>
+            <dd id="statTokens">0 / 0</dd>
+          </div>
+        </dl>
+
+        <div class="wallet-breakdown mono">
+          <div class="break-row">
+            <span>transcribe (4o mini)</span>
+            <span id="lineTranscribeUsd">$0.0000</span>
+          </div>
+          <div class="break-row">
+            <span>translate (4o mini chat)</span>
+            <span id="lineTranslateUsd">$0.0000</span>
+          </div>
+        </div>
+
+        <fieldset class="rate-fieldset">
+          <legend class="rate-legend">rates (edit if OpenAI changed prices on you)</legend>
+          <label class="rate-label">
+            $ / min audio · <span id="rateTransModel" class="muted-inline"></span>
+            <input id="rateTranscribeMin" class="rate-input mono" type="number" step="0.0001" min="0" value="0.003" />
+          </label>
+          <label class="rate-label">
+            translate $ / 1M input toks
+            <input id="rateTranslateIn" class="rate-input mono" type="number" step="0.0001" min="0" value="0.15" />
+          </label>
+          <label class="rate-label">
+            translate $ / 1M output toks
+            <input id="rateTranslateOut" class="rate-input mono" type="number" step="0.0001" min="0" value="0.6" />
+          </label>
+        </fieldset>
+
+        <div class="wallet-actions">
+          <button id="walletReset" type="button" class="btn-meme">reset counters (copium)</button>
+          <span class="tiny-disclaimer mono">server remembers until restart · estimates only</span>
+        </div>
+      </section>
+
+      <section class="toggles-section">
+        <div class="section-label">controls</div>
+        <div class="row">
+          <label>
+            <input id="translateEnabled" type="checkbox" checked />
+            Translate to English
+          </label>
+        </div>
+        <div class="row">
+          <label>
+            <input id="showOriginal" type="checkbox" checked />
+            Show original text
+          </label>
+        </div>
+        <div class="row">
+          <label>
+            <input id="translatedOnly" type="checkbox" />
+            Show translated only
+          </label>
+        </div>
+        <div class="row">
+          <label>
+            <input id="ttsEnabled" type="checkbox" />
+            Text-to-speech (browser · free-ish)
+          </label>
+        </div>
+      </section>
+
+      <div id="manualTest" class="manual-test">
+        <div class="section-label">UI sandbox (zero robux lost)</div>
+        <div class="row">
+          <textarea
+            id="manualInput"
+            rows="2"
+            placeholder="fake subtitle go brrr · Kumusta…"
+            spellcheck="false"
+          ></textarea>
+        </div>
+        <div class="row">
+          <button id="manualSend" type="button" class="btn-secondary">send test subtitle</button>
+        </div>
+      </div>
+
+      <p class="footer-meme mono" id="footerMeme">websocket gobbles captions · you provide trauma</p>
+    </div>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
