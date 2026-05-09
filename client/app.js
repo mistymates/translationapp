@@ -10,6 +10,7 @@ const elTranslatedOnly = $('translatedOnly');
 const elTtsEnabled = $('ttsEnabled');
 const elSourceLanguage = $('sourceLanguage');
 const elToggleApiBtn = $('toggleApiBtn');
+const elClearTranscriptBtn = $('clearTranscriptBtn');
 const elManualInput = $('manualInput');
 const elManualSend = $('manualSend');
 
@@ -264,10 +265,10 @@ function connect() {
       apiPaused = msg.paused;
       if (elToggleApiBtn) {
         if (apiPaused) {
-          elToggleApiBtn.innerHTML = '<span>🔴 API Paused</span><span style="font-size: 0.65em; opacity: 0.8; font-weight: normal;">Click to Resume Listening</span>';
+          elToggleApiBtn.innerHTML = '<span class="pill-icon">🔴</span><span class="pill-text">API Paused</span>';
           elToggleApiBtn.classList.add('is-paused');
         } else {
-          elToggleApiBtn.innerHTML = '<span>🟢 API Listening</span><span style="font-size: 0.65em; opacity: 0.8; font-weight: normal;">Click to Stop & Save Tokens</span>';
+          elToggleApiBtn.innerHTML = '<span class="pill-icon">🟢</span><span class="pill-text">API Listening</span>';
           elToggleApiBtn.classList.remove('is-paused');
         }
       }
@@ -343,6 +344,14 @@ if (elWalletReset) {
   elWalletReset.addEventListener('click', () => {
     if (ws && ws.readyState === ws.OPEN) {
       ws.send(JSON.stringify({ type: 'wallet_reset' }));
+    }
+  });
+}
+
+if (elClearTranscriptBtn) {
+  elClearTranscriptBtn.addEventListener('click', () => {
+    if (elSubtitles) {
+      elSubtitles.innerHTML = '';
     }
   });
 }

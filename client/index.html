@@ -13,167 +13,179 @@
     <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
-    <div id="overlay">
-      <div id="subtitles" aria-live="polite"></div>
-    </div>
-
-    <div id="left-controls">
-      <section class="toggles-section">
-        <div class="section-label">main controls</div>
-        <div class="row">
-           <button id="toggleApiBtn" class="btn-primary" style="width: 100%; font-size: 1.1em; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-             <span>🟢 API Listening</span>
-             <span style="font-size: 0.65em; opacity: 0.8; font-weight: normal;">Click to Stop & Save Tokens</span>
-           </button>
-        </div>
-        <div class="row" style="margin-top: 8px;">
-          <label style="width: 100%; display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
-            <span class="muted" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">Listen For (Source Language)</span>
-            <select id="sourceLanguage" class="rate-input mono" style="font-size: 14px; padding: 8px;">
-              <option value="tl">Tagalog (Forced)</option>
-              <option value="fr">French (Forced)</option>
-              <option value="en">English (Forced)</option>
-              <option value="es">Spanish (Forced)</option>
-              <option value="zh">Mandarin (Forced)</option>
-              <option value="ja">Japanese (Forced)</option>
-              <option value="multi">Chaos Mode (Auto-Detect)</option>
-            </select>
-          </label>
-        </div>
-        <div class="section-label" style="margin-top: 8px;">subtitle settings</div>
-        <div class="row">
-          <label>
-            <input id="translateEnabled" type="checkbox" checked />
-            Translate to English
-          </label>
-        </div>
-        <div class="row">
-          <label>
-            <input id="showOriginal" type="checkbox" checked />
-            Show original text
-          </label>
-        </div>
-        <div class="row">
-          <label>
-            <input id="translatedOnly" type="checkbox" />
-            Show translated only
-          </label>
-        </div>
-        <div class="row">
-          <label>
-            <input id="ttsEnabled" type="checkbox" />
-            Text-to-speech (browser · free-ish)
-          </label>
-        </div>
-      </section>
-    </div>
-
-    <div id="controls">
-      <header class="panel-brand">
-        <div class="brand-title-row">
-          <h1 class="brand-title">VLX-Overlay</h1>
-          <span class="brand-badge">made by mistvlx</span>
-        </div>
-        <p class="brand-sub">Universal Voice Translation</p>
-      </header>
-
-      <div id="apiBanner" class="api-banner hidden" role="status"></div>
-
-      <div id="statusRow" class="row status-row muted">
-        <span id="status">Connecting...</span>
-        <span
-          id="apiBillingLed"
-          class="api-billing-led"
-          title="Green while API requests are in flight"
-          role="img"
-          aria-label="API usage indicator"
-        ></span>
+    <!-- Top Nav -->
+    <header id="top-nav">
+      <div class="nav-brand">
+        <h1 class="brand-title">VLX-Overlay</h1>
+        <span class="brand-sub">Universal Voice Translation</span>
       </div>
-
-      <section class="wallet-card" aria-labelledby="walletHeading">
-        <div class="wallet-card-header">
-          <h2 id="walletHeading" class="wallet-heading">Session Usage Estimator</h2>
-          <p id="walletMeme" class="wallet-meme">Monitor your API burn rate</p>
-        </div>
-
-        <div class="wallet-hero">
-          <div class="wallet-total-label">estimated session burn (USD)</div>
-          <div id="walletTotalUsd" class="wallet-total-usd">$0.0000</div>
-          <div class="wallet-hero-sub mono" id="walletHeroSub">0:00 audio → transcribe · translate extras below</div>
-        </div>
-
-        <dl class="wallet-stats mono">
-          <div class="stat-line">
-            <dt>audio eaten by transcribe</dt>
-            <dd id="statAudioTime">0:00</dd>
-          </div>
-          <div class="stat-line">
-            <dt>time staring at API</dt>
-            <dd id="statWaitTime">0s</dd>
-          </div>
-          <div class="stat-line">
-            <dt>transcribe segments ok / oops</dt>
-            <dd id="statSegments">0 / 0</dd>
-          </div>
-          <div class="stat-line">
-            <dt>HTTP attempts (incl. retries)</dt>
-            <dd id="statAttempts">tr 0 · tl 0</dd>
-          </div>
-          <div class="stat-line">
-            <dt>translate tokens (in / out)</dt>
-            <dd id="statTokens">0 / 0</dd>
-          </div>
-        </dl>
-
-        <div class="wallet-breakdown mono">
-          <div class="break-row">
-            <span>transcribe (deepgram)</span>
-            <span id="lineTranscribeUsd">$0.0000</span>
-          </div>
-          <div class="break-row">
-            <span>translate (google fallback)</span>
-            <span id="lineTranslateUsd">$0.0000</span>
-          </div>
-        </div>
-
-        <fieldset class="rate-fieldset">
-          <legend class="rate-legend">rates (edit if API changed prices on you)</legend>
-          <label class="rate-label">
-            $ / min audio · <span id="rateTransModel" class="muted-inline"></span>
-            <input id="rateTranscribeMin" class="rate-input mono" type="number" step="0.0001" min="0" value="0.003" />
-          </label>
-          <label class="rate-label">
-            translate $ / 1M input toks
-            <input id="rateTranslateIn" class="rate-input mono" type="number" step="0.0001" min="0" value="0.15" />
-          </label>
-          <label class="rate-label">
-            translate $ / 1M output toks
-            <input id="rateTranslateOut" class="rate-input mono" type="number" step="0.0001" min="0" value="0.6" />
-          </label>
-        </fieldset>
-
-        <div class="wallet-actions">
-          <button id="walletReset" type="button" class="btn-meme">Reset Counters</button>
-          <span class="tiny-disclaimer mono">server remembers until restart · estimates only</span>
-        </div>
-      </section>
-
-      <div id="manualTest" class="manual-test">
-        <div class="section-label">UI Sandbox (Test Overlay)</div>
-        <div class="row">
-          <textarea
-            id="manualInput"
-            rows="2"
-            placeholder="Type a test subtitle here..."
-            spellcheck="false"
-          ></textarea>
-        </div>
-        <div class="row">
-          <button id="manualSend" type="button" class="btn-secondary">Send test subtitle</button>
-        </div>
+      <div class="nav-actions">
+        <button id="toggleApiBtn" class="btn-pill" title="Click to Stop/Resume & Save Tokens">
+          <span class="pill-icon">🟢</span>
+          <span class="pill-text">API Listening</span>
+        </button>
       </div>
+    </header>
 
-      <p class="footer-meme mono" id="footerMeme">system audio captured · transcribed locally · translated globally</p>
+    <!-- Grid Layout -->
+    <div id="layout-grid">
+      <!-- Left Rail -->
+      <aside id="left-rail" class="rail">
+        <section class="toggles-section">
+          <div class="section-label">main controls</div>
+          <div class="row" style="margin-top: 8px;">
+            <label style="width: 100%; display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
+              <span class="muted" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;">Listen For (Source Language)</span>
+              <select id="sourceLanguage" class="rate-input mono" style="font-size: 14px; padding: 8px;">
+                <option value="tl">Tagalog (Forced)</option>
+                <option value="fr">French (Forced)</option>
+                <option value="en">English (Forced)</option>
+                <option value="es">Spanish (Forced)</option>
+                <option value="zh">Mandarin (Forced)</option>
+                <option value="ja">Japanese (Forced)</option>
+                <option value="multi">Chaos Mode (Auto-Detect)</option>
+              </select>
+            </label>
+          </div>
+          <div class="section-label" style="margin-top: 16px;">subtitle settings</div>
+          <div class="row">
+            <label>
+              <input id="translateEnabled" type="checkbox" checked />
+              Translate to English
+            </label>
+          </div>
+          <div class="row">
+            <label>
+              <input id="showOriginal" type="checkbox" checked />
+              Show original text
+            </label>
+          </div>
+          <div class="row">
+            <label>
+              <input id="translatedOnly" type="checkbox" />
+              Show translated only
+            </label>
+          </div>
+          <div class="row">
+            <label>
+              <input id="ttsEnabled" type="checkbox" />
+              Text-to-speech (browser · free-ish)
+            </label>
+          </div>
+        </section>
+        
+        <div id="manualTest" class="manual-test" style="margin-top: 16px;">
+          <div class="section-label">UI Sandbox (Test Overlay)</div>
+          <div class="row">
+            <textarea
+              id="manualInput"
+              rows="2"
+              placeholder="Type a test subtitle here..."
+              spellcheck="false"
+            ></textarea>
+          </div>
+          <div class="row">
+            <button id="manualSend" type="button" class="btn-secondary">Send test subtitle</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center Feed -->
+      <main id="center-feed">
+        <div id="subtitles" aria-live="polite"></div>
+        <div class="feed-actions">
+          <button id="clearTranscriptBtn" class="btn-clear">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            Clear Transcript
+          </button>
+        </div>
+      </main>
+
+      <!-- Right Rail -->
+      <aside id="right-rail" class="rail">
+        <div id="apiBanner" class="api-banner hidden" role="status"></div>
+
+        <div id="statusRow" class="row status-row muted">
+          <span id="status">Connecting...</span>
+          <span
+            id="apiBillingLed"
+            class="api-billing-led"
+            title="Green while API requests are in flight"
+            role="img"
+            aria-label="API usage indicator"
+          ></span>
+        </div>
+
+        <section class="wallet-card" aria-labelledby="walletHeading">
+          <div class="wallet-card-header">
+            <h2 id="walletHeading" class="wallet-heading">Session Usage Estimator</h2>
+            <p id="walletMeme" class="wallet-meme">Monitor your API burn rate</p>
+          </div>
+
+          <div class="wallet-hero">
+            <div class="wallet-total-label">estimated session burn (USD)</div>
+            <div id="walletTotalUsd" class="wallet-total-usd">$0.0000</div>
+            <div class="wallet-hero-sub mono" id="walletHeroSub">0:00 audio → transcribe · translate extras below</div>
+          </div>
+
+          <dl class="wallet-stats mono">
+            <div class="stat-line">
+              <dt>audio eaten by transcribe</dt>
+              <dd id="statAudioTime">0:00</dd>
+            </div>
+            <div class="stat-line">
+              <dt>time staring at API</dt>
+              <dd id="statWaitTime">0s</dd>
+            </div>
+            <div class="stat-line">
+              <dt>transcribe segments ok / oops</dt>
+              <dd id="statSegments">0 / 0</dd>
+            </div>
+            <div class="stat-line">
+              <dt>HTTP attempts (incl. retries)</dt>
+              <dd id="statAttempts">tr 0 · tl 0</dd>
+            </div>
+            <div class="stat-line">
+              <dt>translate tokens (in / out)</dt>
+              <dd id="statTokens">0 / 0</dd>
+            </div>
+          </dl>
+
+          <div class="wallet-breakdown mono">
+            <div class="break-row">
+              <span>transcribe (deepgram)</span>
+              <span id="lineTranscribeUsd">$0.0000</span>
+            </div>
+            <div class="break-row">
+              <span>translate (google fallback)</span>
+              <span id="lineTranslateUsd">$0.0000</span>
+            </div>
+          </div>
+
+          <fieldset class="rate-fieldset">
+            <legend class="rate-legend">rates (edit if API changed prices on you)</legend>
+            <label class="rate-label">
+              $ / min audio · <span id="rateTransModel" class="muted-inline"></span>
+              <input id="rateTranscribeMin" class="rate-input mono" type="number" step="0.0001" min="0" value="0.003" />
+            </label>
+            <label class="rate-label">
+              translate $ / 1M input toks
+              <input id="rateTranslateIn" class="rate-input mono" type="number" step="0.0001" min="0" value="0.15" />
+            </label>
+            <label class="rate-label">
+              translate $ / 1M output toks
+              <input id="rateTranslateOut" class="rate-input mono" type="number" step="0.0001" min="0" value="0.6" />
+            </label>
+          </fieldset>
+
+          <div class="wallet-actions">
+            <button id="walletReset" type="button" class="btn-meme">Reset Counters</button>
+            <span class="tiny-disclaimer mono">server remembers until restart · estimates only</span>
+          </div>
+        </section>
+
+        <p class="footer-meme mono" id="footerMeme">system audio captured · transcribed locally · translated globally</p>
+      </aside>
     </div>
 
     <script src="/app.js" type="module"></script>
